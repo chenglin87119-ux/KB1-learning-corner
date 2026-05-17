@@ -437,20 +437,20 @@
   // ========== 📖 单词数据 ==========
   // 衣服类单词
   const clothesWords = [
-    { en: 'jacket', cn: '夹克', emoji: '🧥', example: 'She\\'s got a jacket.' },
-    { en: 'shoes', cn: '鞋子', emoji: '👟', example: 'He\\'s got blue shoes.' },
-    { en: 'skirt', cn: '裙子', emoji: '👗', example: 'She\\'s got a pink skirt.' },
-    { en: 'socks', cn: '袜子', emoji: '🧦', example: 'He\\'s got red socks.' },
-    { en: 'trousers', cn: '裤子', emoji: '👖', example: 'He\\'s got red trousers.' },
-    { en: 'T-shirt', cn: 'T恤', emoji: '👕', example: 'She\\'s got a T-shirt.' }
+    { en: 'jacket', cn: '夹克', emoji: '🧥', example: 'She\'s got a jacket.' },
+    { en: 'shoes', cn: '鞋子', emoji: '👟', example: 'He\'s got blue shoes.' },
+    { en: 'skirt', cn: '裙子', emoji: '👗', example: 'She\'s got a pink skirt.' },
+    { en: 'socks', cn: '袜子', emoji: '🧦', example: 'He\'s got red socks.' },
+    { en: 'trousers', cn: '裤子', emoji: '👖', example: 'He\'s got red trousers.' },
+    { en: 'T-shirt', cn: 'T恤', emoji: '👕', example: 'She\'s got a T-shirt.' }
   ];
 
   // 颜色类单词
   const colorWords = [
-    { en: 'red', cn: '红色', emoji: '🔴', example: 'He\\'s got red trousers.' },
-    { en: 'blue', cn: '蓝色', emoji: '🔵', example: 'She\\'s got blue shoes.' },
-    { en: 'pink', cn: '粉色', emoji: '🩷', example: 'She\\'s got a pink skirt.' },
-    { en: 'green', cn: '绿色', emoji: '🟢', example: 'He\\'s got a green T-shirt.' }
+    { en: 'red', cn: '红色', emoji: '🔴', example: 'He\'s got red trousers.' },
+    { en: 'blue', cn: '蓝色', emoji: '🔵', example: 'She\'s got blue shoes.' },
+    { en: 'pink', cn: '粉色', emoji: '🩷', example: 'She\'s got a pink skirt.' },
+    { en: 'green', cn: '绿色', emoji: '🟢', example: 'He\'s got a green T-shirt.' }
   ];
 
   // ========== 渲染单词卡片 ==========
@@ -490,7 +490,7 @@
     }
     const validAnswers = ['trousers', 'pants'];
     if (validAnswers.includes(input)) {
-      fb.innerHTML = '太棒了！⭐ He\'s got red trousers! 你学会啦！🌟';
+      fb.innerHTML = '太棒了！⭐ He's got red trousers! 你学会啦！🌟';
       fb.className = 'feedback correct';
     } else {
       fb.innerHTML = '再试一次哦～ "裤子"用英语怎么说呀？😊';
@@ -509,7 +509,7 @@
     }
     const validAnswers = ['jacket'];
     if (validAnswers.includes(input)) {
-      fb.innerHTML = '太棒了！⭐ She\'s got a jacket! 真厉害！🌟';
+      fb.innerHTML = '太棒了！⭐ She's got a jacket! 真厉害！🌟';
       fb.className = 'feedback correct';
     } else {
       fb.innerHTML = '再试一次哦～ "夹克"用英语怎么说呀？😊';
@@ -528,7 +528,7 @@
     }
     const validAnswers = ['t-shirt', 'tshirt', 't shirt'];
     if (validAnswers.includes(input)) {
-      fb.innerHTML = '太棒了！⭐ She hasn\'t got a T-shirt! 你好厉害！🌟';
+      fb.innerHTML = '太棒了！⭐ She hasn't got a T-shirt! 你好厉害！🌟';
       fb.className = 'feedback correct';
     } else {
       fb.innerHTML = '再试一次哦～ "T恤"用英语怎么说呀？😊';
