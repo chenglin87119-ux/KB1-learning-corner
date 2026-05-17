@@ -361,15 +361,15 @@
     <div class="section-title orange">📝 句型练习</div>
 
     <div class="sentence-box">
-      <div class="en">😊 I like cake.</div>
+      <div class="en">😊 I like cake.<span class="speaker-btn" onclick="event.stopPropagation();speakWord('I like cake.')">🔊</span></div>
       <div class="cn">我喜欢蛋糕。</div>
     </div>
     <div class="sentence-box">
-      <div class="en">😐 I don't like chocolate.</div>
+      <div class="en">😐 I don't like chocolate.<span class="speaker-btn" onclick="event.stopPropagation();speakWord('I do not like chocolate.')">🔊</span></div>
       <div class="cn">我不喜欢巧克力。</div>
     </div>
     <div class="sentence-box">
-      <div class="en">🤔 Do you like snakes?<br>Yes, I do. / No, I don't.</div>
+      <div class="en">🤔 Do you like snakes?<br>Yes, I do. / No, I don't.<span class="speaker-btn" onclick="event.stopPropagation();speakWord('Do you like snakes? Yes, I do. No, I do not.')">🔊</span></div>
       <div class="cn">你喜欢蛇吗？是的，我喜欢。/ 不，我不喜欢。</div>
     </div>
 
@@ -501,6 +501,12 @@
   function checkBlank3() {
     const input = document.getElementById('blank3').value.trim().toLowerCase();
     const fb = document.getElementById('feedback3');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     if (input === 'like') {
       fb.innerHTML = '太棒了！⭐ Do you like ice cream? 🍦🌟';
       fb.className = 'feedback correct';
