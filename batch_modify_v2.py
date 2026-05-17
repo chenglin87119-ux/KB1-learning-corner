@@ -1,0 +1,287 @@
+#!/usr/bin/env python3
+"""
+Batch modify - v2 fixes:
+- Better CSS detection (some files have no comment before word-card CSS)
+- Better speakWord detection (distinguish template references from standalone function)
+- Better checkBlank counting
+"""
+import os, glob, re
+
+html_dir = "/home/wlsclaw/ket_learning_corner/html"
+files = sorted(glob.glob(os.path.join(html_dir, "unit*.html")))
+
+NEW_CSS_BLOCK = """    /* 单词卡片 - 新设计 */
+    .word-card {
+      background: linear-gradient(145deg, #ffffff, #f8f9ff);
+      border: 3px solid #e8eaff;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .word-card:hover {
+      transform: scale(1.06);
+    }
+    .word-card .emoji {
+      font-size: 2.2em;
+      margin-bottom: 4px;
+    }
+    .word-card .english {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #5c6bc0;
+    }
+    .word-card .chinese {
+      font-size: 0.95em;
+      color: #78909c;
+      margin-top: 4px;
+    }
+    .word-card .example-area {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #fff8e1;
+      border-radius: 12px;
+      font-size: 0.9em;
+      color: #e65100;
+      width: 100%;
+    }
+    .speaker-btn {
+      display: inline-block;
+      font-size: 1.8em;
+      cursor: pointer;
+      margin-left: 6px;
+      transition: transform 0.2s;
+      line-height: 1;
+    }
+    .speaker-btn:hover { transform: scale(1.25); }
+    .speaker-btn:active { transform: scale(0.9); }
+    .speaker-btn.speaking { animation: speakPulse 0.5s ease-in-out 3; }
+    @keyframes speakPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+    .sentence-box .en .speaker-btn {
+      font-size: 1.4em;
+      vertical-align: middle;
+    }"""
+
+NEW_RENDER = """  function renderCards(data, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    data.forEach((word, index) => {
+      const card = document.createElement('div');
+      card.className = 'word-card';
+      card.innerHTML = `
+        <div class="emoji">${word.emoji}</div>
+        <div class="english">${word.en}<span class="speaker-btn" onclick="event.stopPropagation();speakWord('${word.en}')">🔊</span></div>
+        <div class="chinese">${word.cn}</div>
+        <div class="example-area">💬 ${word.example} <span class="speaker-btn" onclick="event.stopPropagation();speakWord('${word.example}')">🔊</span></div>
+      `;
+      container.appendChild(card);
+    });
+  }"""
+
+SPEAK_FUNC = """  // ========== 🔊 发音功能（ResponsiveVoice） ==========
+  function speakWord(text) {
+    responsiveVoice.speak(text, "UK English Female", {rate: 0.8});
+  }"""
+
+OLD_SPEAK_UNIT1 = """  // ========== 🔊 发音功能（Web Speech API） ==========
+  // 使用浏览器自带的语音合成，语速0.8适合小朋友模仿
+  function speakWord(text) {
+    if (!window.speechSynthesis) {
+      alert('你的浏览器不支持发音功能，请试试 Chrome 浏览器哦～😊');
+      return;
+    }
+    // 取消正在播放的语音
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';    // 美式英语发音
+    utterance.rate = 0.8;        // 语速放慢，适合小朋友
+    utterance.pitch = 1.1;       // 音调略高，更友好
+    utterance.volume = 1;
+    window.speechSynthesis.speak(utterance);
+  }"""
+
+def find_func_end(content, start_pos):
+    """Find the closing brace position of a function."""
+    brace_count = 0
+    in_string = False
+    in_template = False
+    string_char = None
+    for i in range(start_pos, len(content)):
+        ch = content[i]
+        if ch == '`' and not in_string:
+            in_template = not in_template
+        elif ch in '"\'' and not in_template:
+            if not in_string:
+                in_string = True
+                string_char = ch
+            elif ch == string_char:
+                in_string = False
+        elif not in_string and not in_template:
+            if ch == '{':
+                brace_count += 1
+            elif ch == '}':
+                brace_count -= 1
+                if brace_count == 0:
+                    return i + 1
+    return len(content)
+
+def has_standalone_speakword(content):
+    """Check if there's a standalone speakWord function (not in template string)."""
+    idx = content.find('function speakWord')
+    if idx < 0:
+        return False
+    # Make sure this isn't inside a template string
+    before = content[max(0,idx-200):idx]
+    # Check if we're inside a backtick template
+    backtick_count = before.count('`')
+    if backtick_count % 2 == 1:
+        return False  # Inside template
+    return True
+
+
+for fp in files:
+    fn = os.path.basename(fp)
+    print(f"\n=== {fn} ===")
+    
+    with open(fp, 'r', encoding='utf-8') as f:
+        content = f.read()
+    orig = content
+    
+    # 1. Add responsiveVoice script
+    if 'responsivevoice.org' not in content:
+        content = content.replace('</head>', '  <script src="https://code.responsivevoice.org/responsivevoice.js"></script>\n</head>', 1)
+        print("  [OK] Added responsiveVoice script")
+    
+    # 2. Replace old word-card CSS - ANY file that has word-card-inner in CSS
+    if 'word-card-inner' in content:
+        # Find where the word-card CSS starts - either at a comment or at .word-card {
+        css_area = content[:content.find('.category-tag')] if '.category-tag' in content else content
+        card_pos = css_area.find('.word-card {')
+        
+        if card_pos >= 0:
+            # Find the start (go back to find beginning of this CSS block)
+            line_start = content.rfind('\n', 0, card_pos) + 1
+            
+            # Find the end - it's the next section starting with comment
+            next_section = content.find('\n    /* 单词分类标签', line_start)
+            if next_section < 0:
+                next_section = content.find('/* 单词分类标签', line_start)
+            if next_section < 0:
+                next_section = len(content)
+            
+            content = content[:line_start] + NEW_CSS_BLOCK + '\n' + content[next_section:]
+            print("  [OK] Replaced flip-card CSS")
+        else:
+            print("  [WARN] No .word-card { found")
+    else:
+        print("  [SKIP] No flip-card CSS (word-card-inner not found)")
+    
+    # 3. Replace renderCards function
+    render_idx = content.find('function renderCards')
+    if render_idx >= 0:
+        # Check if it still has flip pattern
+        end = find_func_end(content, render_idx)
+        old_render = content[render_idx:end]
+        if 'word-card-inner' in old_render or 'tap-hint' in old_render:
+            content = content[:render_idx] + NEW_RENDER + content[end:]
+            print("  [OK] Replaced renderCards function")
+        else:
+            print("  [SKIP] renderCards already updated")
+    else:
+        print("  [WARN] No renderCards function")
+    
+    # 4. Handle speakWord
+    if fn == 'unit1_hello.html':
+        if 'speechSynthesis' in content:
+            old_start = content.find('// ========== 🔊 发音功能（Web Speech API）')
+            if old_start >= 0:
+                func_start = content.find('function speakWord', old_start)
+                if func_start >= 0:
+                    func_end = find_func_end(content, func_start)
+                    end_pos = func_end
+                    while end_pos < len(content) and content[end_pos] in '\n\r ':
+                        end_pos += 1
+                    content = content[:old_start] + SPEAK_FUNC + '\n' + content[end_pos:]
+                    print("  [OK] Replaced speechSynthesis speakWord")
+                else:
+                    print("  [WARN] speakWord not found near speechSynthesis")
+            else:
+                print("  [SKIP] No Web Speech API section")
+    else:
+        if not has_standalone_speakword(content):
+            insert_marker = '// ========== 📝 填空练习逻辑 =========='
+            insert_pos = content.find(insert_marker)
+            if insert_pos < 0:
+                insert_pos = content.find('function checkBlank1')
+            if insert_pos > 0:
+                line_start = content.rfind('\n', 0, insert_pos) + 1
+                content = content[:line_start] + SPEAK_FUNC + '\n\n' + content[line_start:]
+                print("  [OK] Added speakWord function")
+            else:
+                print("  [WARN] Could not find insertion point")
+        else:
+            print("  [SKIP] speakWord already present")
+    
+    # 5. Replace ✅ 检查 with 🔍 检查
+    count_check = content.count('✅ 检查')
+    if count_check > 0:
+        content = content.replace('✅ 检查', '🔍 检查')
+        print(f"  [OK] Replaced {count_check} ✅ 检查 with 🔍 检查")
+    
+    # 6. Add empty-input checks to checkBlank functions
+    # Find all checkBlank functions
+    search_pos = 0
+    check_funcs = []
+    while True:
+        idx = content.find('function checkBlank', search_pos)
+        if idx < 0:
+            break
+        end = find_func_end(content, idx)
+        check_funcs.append((idx, end))
+        search_pos = end
+    
+    modified_count = 0
+    for start, end in reversed(check_funcs):
+        old_func = content[start:end]
+        if 'if (!input)' in old_func:
+            continue  # Already has empty check
+        
+        # Find input and fb declarations
+        input_match = re.search(r"const input = document\.getElementById\('blank\d+'\)\.value\.trim\(\)", old_func)
+        fb_match = re.search(r"const fb = document\.getElementById\('feedback\d+'\)", old_func)
+        
+        if not input_match or not fb_match:
+            continue
+        
+        fb_line_end = old_func.find('\n', fb_match.end())
+        if fb_line_end < 0:
+            fb_line_end = len(old_func)
+        
+        empty_check = """    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
+"""
+        new_func = old_func[:fb_line_end+1] + empty_check + old_func[fb_line_end+1:]
+        content = content[:start] + new_func + content[end:]
+        modified_count += 1
+    
+    print(f"  [OK] Updated {modified_count}/{len(check_funcs)} checkBlank functions")
+    
+    if content != orig:
+        with open(fp, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print("  => Saved")
+    else:
+        print("  => No changes")
+
+print("\n=== ALL DONE ===")

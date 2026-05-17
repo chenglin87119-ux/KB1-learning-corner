@@ -85,72 +85,63 @@
       margin-top: 20px;
     }
     /* 单词卡片 - 正面 */
+    /* 单词卡片 - 新设计 */
     .word-card {
-      height: 180px;
-      perspective: 800px;
-      cursor: pointer;
-    }
-    .word-card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
-    }
-    .word-card.flipped .word-card-inner {
-      transform: rotateY(180deg);
-    }
-    .word-card-front, .word-card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
+      background: linear-gradient(145deg, #ffffff, #f8f9ff);
+      border: 3px solid #e8eaff;
       border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      transition: transform 0.3s;
+      text-align: center;
     }
-    .word-card-front {
-      background: linear-gradient(145deg, #ffffff, #fce4ec);
-      border: 3px solid #f8bbd0;
-    }
-    .word-card-back {
-      background: linear-gradient(145deg, #fce4ec, #f8bbd0);
-      border: 3px solid #f06292;
-      transform: rotateY(180deg);
-    }
-    .word-card:hover .word-card-front,
-    .word-card:hover .word-card-back {
+    .word-card:hover {
       transform: scale(1.06);
     }
     .word-card .emoji {
       font-size: 2.2em;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .word-card .english {
       font-size: 1.3em;
       font-weight: bold;
-      color: #c2185b;
+      color: #5c6bc0;
     }
     .word-card .chinese {
       font-size: 0.95em;
       color: #78909c;
       margin-top: 4px;
     }
-    .word-card .example {
+    .word-card .example-area {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #fff8e1;
+      border-radius: 12px;
       font-size: 0.9em;
-      color: #c2185b;
-      text-align: center;
-      line-height: 1.4;
+      color: #e65100;
+      width: 100%;
     }
-    .word-card .tap-hint {
-      font-size: 0.75em;
-      color: #b0bec5;
-      margin-top: 6px;
+    .speaker-btn {
+      display: inline-block;
+      font-size: 1.8em;
+      cursor: pointer;
+      margin-left: 6px;
+      transition: transform 0.2s;
+      line-height: 1;
+    }
+    .speaker-btn:hover { transform: scale(1.25); }
+    .speaker-btn:active { transform: scale(0.9); }
+    .speaker-btn.speaking { animation: speakPulse 0.5s ease-in-out 3; }
+    @keyframes speakPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+    .sentence-box .en .speaker-btn {
+      font-size: 1.4em;
+      vertical-align: middle;
     }
 
     /* 单词分类标签 */
@@ -340,6 +331,7 @@
       .header h1 { font-size: 1.8em; }
     }
   </style>
+  <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
 
@@ -397,21 +389,21 @@
     <div class="fill-blank">
       <div class="question">① He's got red ________. (裤子)</div>
       <input type="text" id="blank1" placeholder="填衣服的英文">
-      <button class="check-btn" onclick="checkBlank1()">✅ 检查</button>
+      <button class="check-btn" onclick="checkBlank1()">🔍 检查</button>
       <div class="feedback" id="feedback1"></div>
     </div>
 
     <div class="fill-blank">
       <div class="question">② She's got a ________. (夹克)</div>
       <input type="text" id="blank2" placeholder="填衣服的英文">
-      <button class="check-btn" onclick="checkBlank2()">✅ 检查</button>
+      <button class="check-btn" onclick="checkBlank2()">🔍 检查</button>
       <div class="feedback" id="feedback2"></div>
     </div>
 
     <div class="fill-blank">
       <div class="question">③ She hasn't got a ________. (T恤)</div>
       <input type="text" id="blank3" placeholder="填衣服的英文">
-      <button class="check-btn" onclick="checkBlank3()">✅ 检查</button>
+      <button class="check-btn" onclick="checkBlank3()">🔍 检查</button>
       <div class="feedback" id="feedback3"></div>
     </div>
   </div>
@@ -462,29 +454,18 @@
   ];
 
   // ========== 渲染单词卡片 ==========
-  function renderCards(data, containerId) {
+    function renderCards(data, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     data.forEach((word, index) => {
       const card = document.createElement('div');
       card.className = 'word-card';
       card.innerHTML = `
-        <div class="word-card-inner">
-          <div class="word-card-front">
-            <div class="emoji">${word.emoji}</div>
-            <div class="english">${word.en}</div>
-            <div class="chinese">${word.cn}</div>
-            <div class="tap-hint">👆 点我翻转</div>
-          </div>
-          <div class="word-card-back">
-            <div class="example">💬 ${word.example}</div>
-            <div class="tap-hint">👆 点回正面</div>
-          </div>
-        </div>
+        <div class="emoji">${word.emoji}</div>
+        <div class="english">${word.en}<span class="speaker-btn" onclick="event.stopPropagation();speakWord('${word.en}')">🔊</span></div>
+        <div class="chinese">${word.cn}</div>
+        <div class="example-area">💬 ${word.example} <span class="speaker-btn" onclick="event.stopPropagation();speakWord('${word.example}')">🔊</span></div>
       `;
-      card.addEventListener('click', function() {
-        this.classList.toggle('flipped');
-      });
       container.appendChild(card);
     });
   }
@@ -492,10 +473,21 @@
   renderCards(clothesWords, 'cardGridClothes');
   renderCards(colorWords, 'cardGridColors');
 
+  // ========== 🔊 发音功能（ResponsiveVoice） ==========
+  function speakWord(text) {
+    responsiveVoice.speak(text, "UK English Female", {rate: 0.8});
+  }
+
   // ========== 📝 填空练习逻辑 ==========
   function checkBlank1() {
     const input = document.getElementById('blank1').value.trim().toLowerCase();
     const fb = document.getElementById('feedback1');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     const validAnswers = ['trousers', 'pants'];
     if (validAnswers.includes(input)) {
       fb.innerHTML = '太棒了！⭐ He\'s got red trousers! 你学会啦！🌟';
@@ -509,6 +501,12 @@
   function checkBlank2() {
     const input = document.getElementById('blank2').value.trim().toLowerCase();
     const fb = document.getElementById('feedback2');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     const validAnswers = ['jacket'];
     if (validAnswers.includes(input)) {
       fb.innerHTML = '太棒了！⭐ She\'s got a jacket! 真厉害！🌟';
@@ -522,6 +520,12 @@
   function checkBlank3() {
     const input = document.getElementById('blank3').value.trim().toLowerCase();
     const fb = document.getElementById('feedback3');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     const validAnswers = ['t-shirt', 'tshirt', 't shirt'];
     if (validAnswers.includes(input)) {
       fb.innerHTML = '太棒了！⭐ She hasn\'t got a T-shirt! 你好厉害！🌟';

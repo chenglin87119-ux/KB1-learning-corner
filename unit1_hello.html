@@ -85,51 +85,25 @@
       margin-top: 20px;
     }
     /* 单词卡片 - 正面 */
+    /* 单词卡片 - 新设计 */
     .word-card {
-      height: 180px;
-      perspective: 800px;
-      cursor: pointer;
-    }
-    .word-card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
-    }
-    .word-card.flipped .word-card-inner {
-      transform: rotateY(180deg);
-    }
-    .word-card-front, .word-card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
+      background: linear-gradient(145deg, #ffffff, #f8f9ff);
+      border: 3px solid #e8eaff;
       border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      transition: transform 0.3s;
+      text-align: center;
     }
-    .word-card-front {
-      background: linear-gradient(145deg, #ffffff, #f8f9ff);
-      border: 3px solid #e8eaff;
-    }
-    .word-card-back {
-      background: linear-gradient(145deg, #fff3e0, #ffe0b2);
-      border: 3px solid #ffcc80;
-      transform: rotateY(180deg);
-    }
-    .word-card:hover .word-card-front,
-    .word-card:hover .word-card-back {
+    .word-card:hover {
       transform: scale(1.06);
     }
     .word-card .emoji {
       font-size: 2.2em;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .word-card .english {
       font-size: 1.3em;
@@ -141,13 +115,15 @@
       color: #78909c;
       margin-top: 4px;
     }
-    .word-card .example {
+    .word-card .example-area {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #fff8e1;
+      border-radius: 12px;
       font-size: 0.9em;
       color: #e65100;
-      text-align: center;
-      line-height: 1.4;
+      width: 100%;
     }
-    /* 发音按钮 */
     .speaker-btn {
       display: inline-block;
       font-size: 1.8em;
@@ -166,11 +142,6 @@
     .sentence-box .en .speaker-btn {
       font-size: 1.4em;
       vertical-align: middle;
-    }
-    .word-card .tap-hint {
-      font-size: 0.75em;
-      color: #b0bec5;
-      margin-top: 6px;
     }
 
     /* 单词分类标签 */
@@ -361,6 +332,7 @@
       .header h1 { font-size: 1.8em; }
     }
   </style>
+  <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
 
@@ -424,21 +396,21 @@
     <div class="fill-blank">
       <div class="question">① Hello! I'm ________. (填入你的名字)</div>
       <input type="text" id="blank1" placeholder="你的英文名">
-      <button class="check-btn" onclick="checkBlank1()">✅ 检查</button>
+      <button class="check-btn" onclick="checkBlank1()">🔍 检查</button>
       <div class="feedback" id="feedback1"></div>
     </div>
 
     <div class="fill-blank">
       <div class="question">② How old are you? I'm ________. (填入数字)</div>
       <input type="text" id="blank2" placeholder="如: seven">
-      <button class="check-btn" onclick="checkBlank2()">✅ 检查</button>
+      <button class="check-btn" onclick="checkBlank2()">🔍 检查</button>
       <div class="feedback" id="feedback2"></div>
     </div>
 
     <div class="fill-blank">
       <div class="question">③ What colour's the pencil? It's ________. (填入颜色)</div>
       <input type="text" id="blank3" placeholder="如: red">
-      <button class="check-btn" onclick="checkBlank3()">✅ 检查</button>
+      <button class="check-btn" onclick="checkBlank3()">🔍 检查</button>
       <div class="feedback" id="feedback3"></div>
     </div>
   </div>
@@ -510,29 +482,18 @@
   ];
 
   // ========== 渲染单词卡片 ==========
-  function renderCards(data, containerId) {
+    function renderCards(data, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     data.forEach((word, index) => {
       const card = document.createElement('div');
       card.className = 'word-card';
       card.innerHTML = `
-        <div class="word-card-inner">
-          <div class="word-card-front">
-            <div class="emoji">${word.emoji}</div>
-            <div class="english">${word.en}<span class="speaker-btn" data-word="${word.en}" onclick="event.stopPropagation();speakWord(this.dataset.word)">🔊</span></div>
-            <div class="chinese">${word.cn}</div>
-            <div class="tap-hint">👆 点我翻转</div>
-          </div>
-          <div class="word-card-back">
-            <div class="example">💬 ${word.example}<span class="speaker-btn" data-word="${word.en}" onclick="event.stopPropagation();speakWord(this.dataset.word)" style="font-size:1.2em;margin-left:8px;">🔊</span></div>
-            <div class="tap-hint">👆 点回正面</div>
-          </div>
-        </div>
+        <div class="emoji">${word.emoji}</div>
+        <div class="english">${word.en}<span class="speaker-btn" onclick="event.stopPropagation();speakWord('${word.en}')">🔊</span></div>
+        <div class="chinese">${word.cn}</div>
+        <div class="example-area">💬 ${word.example} <span class="speaker-btn" onclick="event.stopPropagation();speakWord('${word.example}')">🔊</span></div>
       `;
-      card.addEventListener('click', function() {
-        this.classList.toggle('flipped');
-      });
       container.appendChild(card);
     });
   }
@@ -541,27 +502,20 @@
   renderCards(numberWords, 'cardGridNumbers');
   renderCards(colorWords, 'cardGridColors');
 
-  // ========== 🔊 发音功能（Web Speech API） ==========
-  // 使用浏览器自带的语音合成，语速0.8适合小朋友模仿
+    // ========== 🔊 发音功能（ResponsiveVoice） ==========
   function speakWord(text) {
-    if (!window.speechSynthesis) {
-      alert('你的浏览器不支持发音功能，请试试 Chrome 浏览器哦～😊');
-      return;
-    }
-    // 取消正在播放的语音
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';    // 美式英语发音
-    utterance.rate = 0.8;        // 语速放慢，适合小朋友
-    utterance.pitch = 1.1;       // 音调略高，更友好
-    utterance.volume = 1;
-    window.speechSynthesis.speak(utterance);
+    responsiveVoice.speak(text, "UK English Female", {rate: 0.8});
   }
-
-  // ========== 📝 填空练习逻辑 ==========
+// ========== 📝 填空练习逻辑 ==========
   function checkBlank1() {
     const input = document.getElementById('blank1').value.trim();
     const fb = document.getElementById('feedback1');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     if (input.length > 0) {
       fb.innerHTML = '太棒了！⭐ 你学会介绍自己啦！🌟';
       fb.className = 'feedback correct';
@@ -574,6 +528,12 @@
   function checkBlank2() {
     const input = document.getElementById('blank2').value.trim().toLowerCase();
     const fb = document.getElementById('feedback2');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     // 接受数字词或数字本身
     const validNums = ['one','two','three','four','five','six','seven','eight','nine','ten'];
     const validDigits = ['1','2','3','4','5','6','7','8','9','10'];
@@ -589,6 +549,12 @@
   function checkBlank3() {
     const input = document.getElementById('blank3').value.trim().toLowerCase();
     const fb = document.getElementById('feedback3');
+    if (!input) {
+      fb.innerHTML = '✏️ 在这里写下你的答案吧～';
+      fb.className = 'feedback';
+      fb.style.color = '#999';
+      return;
+    }
     const validColors = ['blue','green','pink','purple','red','orange','yellow','rainbow'];
     if (validColors.includes(input)) {
       fb.innerHTML = `太棒了！⭐ ${input} 是一种很漂亮的颜色！🌟`;
