@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 5 - Our Pets 🐾 小可爱的英语乐园</title>
+  <style>
+    /* ========== 全局风格 - 紫色系 ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #f3e5f5 0%, #e8eaf6 50%, #fce4ec 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    /* ========== 顶部横幅 ========== */
+    .header {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #ce93d8 0%, #b39ddb 50%, #e1bee7 100%);
+      border-radius: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(186, 104, 200, 0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .header h1 {
+      font-size: 2.5em;
+      color: #fff;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+    }
+    .header h1 .emoji-big { font-size: 1.2em; }
+    .header .subtitle {
+      font-size: 1.3em;
+      color: #fff;
+      margin-top: 8px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    .header .encourage {
+      margin-top: 12px;
+      font-size: 1.5em;
+      color: #7b1fa2;
+      background: rgba(255,255,255,0.7);
+      display: inline-block;
+      padding: 8px 24px;
+      border-radius: 50px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* ========== 区域标题 ========== */
+    .section-title {
+      font-size: 1.8em;
+      padding: 12px 28px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      display: inline-block;
+    }
+    .section-title.purple { background: linear-gradient(135deg, #ab47bc 0%, #7e57c2 100%); }
+    .section-title.pink { background: linear-gradient(135deg, #ec407a 0%, #ab47bc 100%); }
+    .section-title.teal { background: linear-gradient(135deg, #26a69a 0%, #7e57c2 100%); }
+
+    /* ========== 第一部分：单词卡片区 ========== */
+    .card-section {
+      background: rgba(255,255,255,0.85);
+      border-radius: 30px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    /* 单词卡片 - 正面 */
+    .word-card {
+      height: 180px;
+      perspective: 800px;
+      cursor: pointer;
+    }
+    .word-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .word-card.flipped .word-card-inner {
+      transform: rotateY(180deg);
+    }
+    .word-card-front, .word-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
+    }
+    .word-card-front {
+      background: linear-gradient(145deg, #ffffff, #f3e5f5);
+      border: 3px solid #e1bee7;
+    }
+    .word-card-back {
+      background: linear-gradient(145deg, #f3e5f5, #e1bee7);
+      border: 3px solid #ce93d8;
+      transform: rotateY(180deg);
+    }
+    .word-card:hover .word-card-front,
+    .word-card:hover .word-card-back {
+      transform: scale(1.06);
+    }
+    .word-card .emoji {
+      font-size: 2.2em;
+      margin-bottom: 6px;
+    }
+    .word-card .english {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #7b1fa2;
+    }
+    .word-card .chinese {
+      font-size: 0.95em;
+      color: #78909c;
+      margin-top: 4px;
+    }
+    .word-card .example {
+      font-size: 0.9em;
+      color: #6a1b9a;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .word-card .tap-hint {
+      font-size: 0.75em;
+      color: #b0bec5;
+      margin-top: 6px;
+    }
+
+    /* 单词分类标签 */
+    .category-tag {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      color: #fff;
+      margin: 10px 0 6px 0;
+    }
+    .tag-pets { background: #ab47bc; }
+    .tag-adjectives { background: #7e57c2; }
+
+    /* ========== 第二部分：句型练习区 ========== */
+    .sentence-section {
+      background: rgba(255,255,255,0.85);
+      border-radius: 30px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .sentence-box {
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      border-radius: 16px;
+      padding: 18px;
+      margin: 12px 0;
+    }
+    .sentence-box .en { font-size: 1.2em; color: #6a1b9a; font-weight: bold; }
+    .sentence-box .cn { font-size: 1em; color: #7b1fa2; margin-top: 4px; }
+
+    /* 填空练习 */
+    .fill-blank {
+      background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 16px 0;
+    }
+    .fill-blank .question {
+      font-size: 1.2em;
+      color: #6a1b9a;
+      margin-bottom: 10px;
+    }
+    .fill-blank input {
+      border: 3px solid #ce93d8;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 1.1em;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .fill-blank input:focus {
+      border-color: #7b1fa2;
+      box-shadow: 0 0 0 3px rgba(123,31,162,0.2);
+    }
+    .fill-blank .check-btn {
+      background: linear-gradient(135deg, #ce93d8, #ab47bc);
+      border: none;
+      border-radius: 12px;
+      padding: 10px 24px;
+      font-size: 1.1em;
+      color: #fff;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: transform 0.2s;
+    }
+    .fill-blank .check-btn:hover { transform: scale(1.05); }
+    .fill-blank .check-btn:active { transform: scale(0.95); }
+    .fill-blank .feedback {
+      margin-top: 10px;
+      font-size: 1.3em;
+      min-height: 1.5em;
+    }
+    .fill-blank .correct { color: #4caf50; }
+    .fill-blank .wrong { color: #ff5722; }
+
+    /* ========== 第三部分：游戏区 ========== */
+    .game-section {
+      background: rgba(255,255,255,0.85);
+      border-radius: 30px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .game-area {
+      min-height: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .game-status {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 15px;
+    }
+    .game-status .score, .game-status .timer {
+      font-size: 1.2em;
+      background: linear-gradient(135deg, #ce93d8, #e1bee7);
+      padding: 8px 20px;
+      border-radius: 20px;
+      color: #fff;
+    }
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .game-card {
+      aspect-ratio: 1;
+      background: linear-gradient(145deg, #e1bee7, #ce93d8);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border: 3px solid transparent;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      border-color: #7b1fa2;
+    }
+    .game-card.matched {
+      background: linear-gradient(145deg, #c8e6c9, #a5d6a7);
+      color: #2e7d32;
+      cursor: default;
+      opacity: 0.6;
+      transform: scale(0.95);
+    }
+    .game-card.selected {
+      border-color: #4a148c;
+      transform: scale(1.08);
+      box-shadow: 0 0 20px rgba(74,20,140,0.3);
+    }
+    .game-result {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.5em;
+      color: #6a1b9a;
+    }
+    .game-result .stars { font-size: 2em; }
+    .game-start-btn {
+      background: linear-gradient(135deg, #ab47bc, #7e57c2);
+      border: none;
+      border-radius: 30px;
+      padding: 16px 40px;
+      font-size: 1.4em;
+      color: #fff;
+      cursor: pointer;
+      margin: 20px 0;
+      box-shadow: 0 4px 15px rgba(171,71,188,0.4);
+      transition: transform 0.3s;
+    }
+    .game-start-btn:hover { transform: scale(1.08); }
+
+    /* ========== 页尾导航 ========== */
+    .footer-nav {
+      text-align: center;
+      padding: 20px;
+    }
+    .back-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #ce93d8, #7e57c2);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 32px;
+      border-radius: 30px;
+      font-size: 1.2em;
+      transition: transform 0.3s;
+    }
+    .back-btn:hover { transform: scale(1.05); }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+      .game-grid { grid-template-columns: repeat(4, 1fr); }
+      .header h1 { font-size: 1.8em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ========== 顶部横幅 ========== -->
+  <div class="header">
+    <h1><span class="emoji-big">🐾</span> Unit 5 - Our Pets <span class="emoji-big">🐶</span></h1>
+    <div class="subtitle">🐱 我们的宠物朋友！一起来认识它们吧！</div>
+    <div class="encourage">⭐ 小可爱，你真棒！今天也要加油哦！ ⭐</div>
+  </div>
+
+  <!-- ========== 📖 第一部分：单词卡片区 ========== -->
+  <div class="card-section">
+    <div class="section-title purple">📖 单词卡片</div>
+    <p style="color:#888;margin-bottom:10px;">👆 点击卡片翻过来，看看例句吧！</p>
+
+    <!-- 宠物类 -->
+    <div class="category-tag tag-pets">🐾 宠物 Pets</div>
+    <div class="card-grid" id="cardGridPets">
+      <!-- 卡片由 JS 动态生成 -->
+    </div>
+
+    <!-- 形容词类 -->
+    <div class="category-tag tag-adjectives" style="margin-top:20px;">📏 形容词 Adjectives</div>
+    <div class="card-grid" id="cardGridAdjectives">
+      <!-- 卡片由 JS 动态生成 -->
+    </div>
+  </div>
+
+  <!-- ========== 📝 第二部分：句型练习区 ========== -->
+  <div class="sentence-section">
+    <div class="section-title pink">📝 句型练习</div>
+
+    <div class="sentence-box">
+      <div class="en">🐶 They're small.</div>
+      <div class="cn">它们很小。</div>
+    </div>
+    <div class="sentence-box">
+      <div class="en">🧼 They're clean.</div>
+      <div class="cn">它们很干净。</div>
+    </div>
+    <div class="sentence-box">
+      <div class="en">🐘 It's big.</div>
+      <div class="cn">它很大。</div>
+    </div>
+    <div class="sentence-box">
+      <div class="en">🐭 It's small.</div>
+      <div class="cn">它很小。</div>
+    </div>
+
+    <!-- 填空练习 -->
+    <h3 style="color:#6a1b9a;margin:20px 0 10px;">✏️ 填空小练习</h3>
+
+    <div class="fill-blank">
+      <div class="question">① The mouse is ________. (老鼠很小 / 填入形容词)</div>
+      <input type="text" id="blank1" placeholder="填形容词">
+      <button class="check-btn" onclick="checkBlank1()">✅ 检查</button>
+      <div class="feedback" id="feedback1"></div>
+    </div>
+
+    <div class="fill-blank">
+      <div class="question">② The horse is ________. (马很大 / 填入形容词)</div>
+      <input type="text" id="blank2" placeholder="填形容词">
+      <button class="check-btn" onclick="checkBlank2()">✅ 检查</button>
+      <div class="feedback" id="feedback2"></div>
+    </div>
+
+    <div class="fill-blank">
+      <div class="question">③ The cats are ________. (猫很干净 / 填入形容词)</div>
+      <input type="text" id="blank3" placeholder="填形容词">
+      <button class="check-btn" onclick="checkBlank3()">✅ 检查</button>
+      <div class="feedback" id="feedback3"></div>
+    </div>
+  </div>
+
+  <!-- ========== 🎮 第三部分：单词连连看 ========== -->
+  <div class="game-section">
+    <div class="section-title teal">🎮 单词连连看</div>
+    <p style="color:#888;margin-bottom:10px;">🔗 把英文单词和它的中文意思连起来！</p>
+
+    <div class="game-area" id="gameArea">
+      <div class="game-status">
+        <div class="score">⭐ 得分: <span id="gameScore">0</span></div>
+        <div class="timer">⏱️ 时间: <span id="gameTimer">60</span>s</div>
+      </div>
+      <div class="game-grid" id="gameGrid">
+        <!-- 游戏卡片由 JS 动态生成 -->
+      </div>
+      <div class="game-result" id="gameResult" style="display:none;"></div>
+      <button class="game-start-btn" id="gameStartBtn" onclick="startGame()">🎮 开始游戏！</button>
+    </div>
+  </div>
+
+  <!-- ========== 页尾导航 ========== -->
+  <div class="footer-nav">
+    <a href="kidsbox1.html" class="back-btn">🏠 回到首页</a>
+  </div>
+
+</div>
+
+<script>
+  // ========== 📖 单词数据 ==========
+  // 宠物类单词
+  const petsWords = [
+    { en: 'bird', cn: '鸟', emoji: '🐦', example: 'Look! A bird in the tree.' },
+    { en: 'cat', cn: '猫', emoji: '🐱', example: 'My cat is white and black.' },
+    { en: 'dog', cn: '狗', emoji: '🐶', example: 'I have a pet dog.' },
+    { en: 'fish', cn: '鱼', emoji: '🐟', example: 'The fish can swim.' },
+    { en: 'horse', cn: '马', emoji: '🐴', example: 'The horse is big.' },
+    { en: 'mouse', cn: '老鼠', emoji: '🐭', example: 'The mouse is small.' }
+  ];
+
+  // 形容词类单词
+  const adjectiveWords = [
+    { en: 'big', cn: '大的', emoji: '🐘', example: 'An elephant is big.' },
+    { en: 'small', cn: '小的', emoji: '🐭', example: 'A mouse is small.' },
+    { en: 'clean', cn: '干净的', emoji: '🧼', example: 'The cat is clean.' },
+    { en: 'dirty', cn: '脏的', emoji: '💩', example: 'My hands are dirty.' },
+    { en: 'long', cn: '长的', emoji: '📏', example: 'The snake is long.' },
+    { en: 'short', cn: '短的', emoji: '✂️', example: 'My pencil is short.' }
+  ];
+
+  // ========== 渲染单词卡片 ==========
+  function renderCards(data, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    data.forEach((word, index) => {
+      const card = document.createElement('div');
+      card.className = 'word-card';
+      card.innerHTML = `
+        <div class="word-card-inner">
+          <div class="word-card-front">
+            <div class="emoji">${word.emoji}</div>
+            <div class="english">${word.en}</div>
+            <div class="chinese">${word.cn}</div>
+            <div class="tap-hint">👆 点我翻转</div>
+          </div>
+          <div class="word-card-back">
+            <div class="example">💬 ${word.example}</div>
+            <div class="tap-hint">👆 点回正面</div>
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', function() {
+        this.classList.toggle('flipped');
+      });
+      container.appendChild(card);
+    });
+  }
+
+  renderCards(petsWords, 'cardGridPets');
+  renderCards(adjectiveWords, 'cardGridAdjectives');
+
+  // ========== 📝 填空练习逻辑 ==========
+  function checkBlank1() {
+    const input = document.getElementById('blank1').value.trim().toLowerCase();
+    const fb = document.getElementById('feedback1');
+    if (input === 'small') {
+      fb.innerHTML = '太棒了！⭐ 老鼠很小，small！🌟';
+      fb.className = 'feedback correct';
+    } else {
+      fb.innerHTML = '再试一次哦～ 老鼠非常小，用哪个形容词呢？😊';
+      fb.className = 'feedback wrong';
+    }
+  }
+
+  function checkBlank2() {
+    const input = document.getElementById('blank2').value.trim().toLowerCase();
+    const fb = document.getElementById('feedback2');
+    if (input === 'big') {
+      fb.innerHTML = '太棒了！⭐ 马很大，big！🌟';
+      fb.className = 'feedback correct';
+    } else {
+      fb.innerHTML = '再试一次哦～ 马非常大，用哪个形容词呢？😊';
+      fb.className = 'feedback wrong';
+    }
+  }
+
+  function checkBlank3() {
+    const input = document.getElementById('blank3').value.trim().toLowerCase();
+    const fb = document.getElementById('feedback3');
+    if (input === 'clean') {
+      fb.innerHTML = '太棒了！⭐ 猫很干净，clean！🌟';
+      fb.className = 'feedback correct';
+    } else {
+      fb.innerHTML = '再试一次哦～ 猫洗澡后很干净，用哪个词呢？😊';
+      fb.className = 'feedback wrong';
+    }
+  }
+
+  // ========== 🎮 游戏逻辑（单词连连看） ==========
+  let gameCards = [];
+  let selectedCard = null;
+  let score = 0;
+  let timeLeft = 60;
+  let gameTimer = null;
+  let gameActive = false;
+  let matchedCount = 0;
+  let totalPairs = 0;
+
+  function startGame() {
+    // 重置游戏状态
+    score = 0;
+    timeLeft = 60;
+    matchedCount = 0;
+    gameActive = true;
+    selectedCard = null;
+    document.getElementById('gameScore').textContent = '0';
+    document.getElementById('gameTimer').textContent = '60';
+    document.getElementById('gameResult').style.display = 'none';
+    document.getElementById('gameStartBtn').style.display = 'none';
+
+    // 准备游戏数据：8对（宠物 + 形容词混合）
+    const wordPairs = [
+      { en: 'cat', cn: '猫', emoji: '🐱' },
+      { en: 'dog', cn: '狗', emoji: '🐶' },
+      { en: 'bird', cn: '鸟', emoji: '🐦' },
+      { en: 'fish', cn: '鱼', emoji: '🐟' },
+      { en: 'horse', cn: '马', emoji: '🐴' },
+      { en: 'mouse', cn: '老鼠', emoji: '🐭' },
+      { en: 'big', cn: '大的', emoji: '🐘' },
+      { en: 'small', cn: '小的', emoji: '🐭' }
+    ];
+
+    // 全部8对使用
+    totalPairs = wordPairs.length;
+
+    // 生成卡片数据（每对拆成2张）
+    gameCards = [];
+    wordPairs.forEach((pair, idx) => {
+      gameCards.push({ id: idx, type: 'en', text: pair.en, pairId: idx, emoji: pair.emoji });
+      gameCards.push({ id: idx, type: 'cn', text: pair.cn, pairId: idx, emoji: pair.emoji });
+    });
+    // 打乱排列
+    gameCards = shuffleArray(gameCards);
+
+    // 渲染游戏网格
+    const grid = document.getElementById('gameGrid');
+    grid.innerHTML = '';
+    gameCards.forEach((card, index) => {
+      const div = document.createElement('div');
+      div.className = 'game-card';
+      div.dataset.index = index;
+      div.dataset.pairId = card.pairId;
+      div.dataset.type = card.type;
+      div.dataset.matched = 'false';
+      // 显示英文/中文
+      div.textContent = card.text;
+      if (card.type === 'en') {
+        div.style.background = 'linear-gradient(145deg, #ce93d8, #ab47bc)';
+        div.style.color = '#fff';
+      } else {
+        div.style.background = 'linear-gradient(145deg, #e1bee7, #ce93d8)';
+        div.style.color = '#4a148c';
+      }
+      div.addEventListener('click', function() { onGameCardClick(this); });
+      grid.appendChild(div);
+    });
+
+    // 启动倒计时
+    if (gameTimer) clearInterval(gameTimer);
+    gameTimer = setInterval(function() {
+      timeLeft--;
+      document.getElementById('gameTimer').textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(gameTimer);
+        gameActive = false;
+        endGame();
+      }
+    }, 1000);
+  }
+
+  function onGameCardClick(card) {
+    if (!gameActive) return;
+    if (card.dataset.matched === 'true') return; // 已配对不可再点
+
+    if (!selectedCard) {
+      // 选第一张
+      selectedCard = card;
+      card.classList.add('selected');
+    } else {
+      // 选第二张 - 检查配对
+      const first = selectedCard;
+      const second = card;
+      if (first === second) return; // 同一张
+
+      const firstPairId = first.dataset.pairId;
+      const secondPairId = second.dataset.pairId;
+      const firstType = first.dataset.type;
+      const secondType = second.dataset.type;
+
+      if (firstPairId === secondPairId && firstType !== secondType) {
+        // 配对成功！
+        first.dataset.matched = 'true';
+        second.dataset.matched = 'true';
+        first.classList.remove('selected');
+        first.classList.add('matched');
+        second.classList.add('matched');
+        score += 10;
+        matchedCount++;
+        document.getElementById('gameScore').textContent = score;
+        document.getElementById('gameScore').style.animation = 'none';
+        setTimeout(() => {
+          document.getElementById('gameScore').style.animation = 'pulse 0.3s';
+        }, 10);
+
+        if (matchedCount >= totalPairs) {
+          // 全部配对完成
+          clearInterval(gameTimer);
+          gameActive = false;
+          // 剩余时间加分
+          score += timeLeft * 2;
+          document.getElementById('gameScore').textContent = score;
+          endGame();
+        }
+      } else {
+        // 配对失败
+        first.classList.remove('selected');
+        // 闪烁提示
+        first.style.borderColor = '#ff5722';
+        second.style.borderColor = '#ff5722';
+        setTimeout(() => {
+          first.style.borderColor = 'transparent';
+          second.style.borderColor = 'transparent';
+        }, 500);
+      }
+      selectedCard = null;
+    }
+  }
+
+  function endGame() {
+    const result = document.getElementById('gameResult');
+    result.style.display = 'block';
+    let stars = 0;
+    if (score >= 100) stars = 3;
+    else if (score >= 60) stars = 2;
+    else if (score >= 20) stars = 1;
+
+    let starStr = '';
+    for (let i = 0; i < stars; i++) starStr += '⭐';
+    if (stars === 0) starStr = '💪';
+
+    let msg = '';
+    if (stars === 3) msg = '太厉害了！你是英语小达人！🎉🎉🎉';
+    else if (stars === 2) msg = '真棒！再练一次就能拿满星！🌟';
+    else if (stars === 1) msg = '不错哦！多玩几次就熟悉啦！😊';
+    else msg = '没关系哦，再来一次吧！💪';
+
+    result.innerHTML = `
+      <div class="game-result">
+        <div class="stars">${starStr}</div>
+        <p>你获得了 ${score} 分！</p>
+        <p>${msg}</p>
+        <p style="font-size:0.7em;margin-top:10px;">小可爱，你真棒！🌟</p>
+      </div>
+    `;
+    document.getElementById('gameStartBtn').style.display = 'inline-block';
+    document.getElementById('gameStartBtn').textContent = '🔄 再玩一次';
+  }
+
+  // ========== 工具函数 ==========
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+</script>
+
+</body>
+</html>
